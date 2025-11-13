@@ -1,21 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- MATERIAL YOU DARK THEME -->
     <color name="md_theme_dark_primary">#9CCAFF</color>
     <color name="md_theme_dark_onPrimary">#003258</color>
     <color name="md_theme_dark_primaryContainer">#00497D</color>
-    <color name="md_theme_dark_onPrimaryContainer">#D0E4FF</color>
+    <color name="md_theme_dark_onPrimaryContainer">#D1E4FF</color>
 
     <color name="md_theme_dark_secondary">#BBC7DB</color>
     <color name="md_theme_dark_onSecondary">#253140</color>
-    <color name="md_theme_dark_secondaryContainer">#3C4656</color>
+    <color name="md_theme_dark_secondaryContainer">#3B4757</color>
     <color name="md_theme_dark_onSecondaryContainer">#D7E3F7</color>
 
-    <color name="md_theme_dark_background">#1A1C1E</color>
-    <color name="md_theme_dark_onBackground">#E2E2E6</color>
-
-    <color name="md_theme_dark_surface">#1A1C1E</color>
-    <color name="md_theme_dark_onSurface">#E2E2E6</color>
+    <color name="md_theme_dark_background">#1B1B1F</color>
+    <color name="md_theme_dark_onBackground">#E3E2E6</color>
 
 </resources>
