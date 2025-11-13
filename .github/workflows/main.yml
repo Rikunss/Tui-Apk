@@ -2,10 +2,7 @@ name: Android APK Build
 
 on:
   push:
-    branches:
-      - main
-      - master
-      - dev
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
@@ -13,32 +10,43 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+    - name: Checkout repository
+      uses: actions/checkout@v3
 
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: '17'
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
 
-      - name: Grant execute permission for Gradlew
-        run: chmod +x ./gradlew
+    - name: Grant execute permission for Gradlew
+      run: chmod +x gradlew
 
-      - name: Build Debug APK
-        run: ./gradlew assembleDebug
+    - name: Build Release APK
+      run: ./gradlew assembleRelease
 
-      - name: Upload Debug APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: TuiDownloader-Debug
-          path: app/build/outputs/apk/debug/*.apk
+    - name: Upload Release Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: TuiDownloader-Release
+        path: app/build/outputs/apk/release/*.apk
 
-      - name: Build Release APK
-        run: ./gradlew assembleRelease
+    # ===========================
+    #   AUTO CREATE RELEASE
+    # ===========================
 
-      - name: Upload Release APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: TuiDownloader-Release
-          path: app/build/outputs/apk/release/*.apk
+    - name: Get Current Date
+      id: date
+      run: echo "date=$(date +'%Y%m%d-%H%M%S')" >> $GITHUB_OUTPUT
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: v${{ steps.date.outputs.date }}
+        name: "TuiDownloader Release ${{ steps.date.outputs.date }}"
+        body: |
+          Automated Release Build
+          Timestamp: ${{ steps.date.outputs.date }}
+        files: app/build/outputs/apk/release/*.apk
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
