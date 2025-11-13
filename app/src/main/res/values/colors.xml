@@ -1,16 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- Light Colors (harus ada untuk lint) -->
+    <!-- Light theme colors -->
     <color name="md_theme_light_primary">#0061A4</color>
     <color name="md_theme_light_onPrimary">#FFFFFF</color>
     <color name="md_theme_light_primaryContainer">#D1E4FF</color>
     <color name="md_theme_light_onPrimaryContainer">#001D36</color>
 
-    <!-- Duplikasi untuk menutupi error MissingDefaultResource -->
+    <!-- Dark theme colors (fallback) -->
     <color name="md_theme_dark_primary">#9CCAFF</color>
     <color name="md_theme_dark_onPrimary">#003258</color>
     <color name="md_theme_dark_primaryContainer">#00497D</color>
     <color name="md_theme_dark_onPrimaryContainer">#D1E4FF</color>
+
+    <!-- Missing ones you must add -->
+    <color name="md_theme_dark_secondary">#BBC7DB</color>
+    <color name="md_theme_dark_onSecondary">#253140</color>
+    <color name="md_theme_dark_secondaryContainer">#3B4757</color>
+    <color name="md_theme_dark_onSecondaryContainer">#D7E3F7</color>
+
+    <color name="md_theme_dark_background">#1B1B1F</color>
+    <color name="md_theme_dark_onBackground">#E3E2E6</color>
 
 </resources>
