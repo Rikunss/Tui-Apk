@@ -3,7 +3,11 @@ package com.tui.downloader.telegram
 import android.content.Context
 import android.util.Log
 import androidx.preference.PreferenceManager
-import okhttp3.*
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.MultipartBody
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody
 import java.io.File
 
 /**
@@ -25,6 +29,7 @@ class TelegramUploader(private val context: Context) {
     }
 
     suspend fun upload(file: File) {
+
         val token = getBotToken()
         val chatId = getChatId()
 
@@ -35,13 +40,16 @@ class TelegramUploader(private val context: Context) {
 
         val url = "https://api.telegram.org/bot$token/sendDocument"
 
+        // OkHttp v4 syntax
+        val fileMediaType = "application/octet-stream".toMediaType()
+
         val body = MultipartBody.Builder()
             .setType(MultipartBody.FORM)
             .addFormDataPart("chat_id", chatId)
             .addFormDataPart(
                 "document",
                 file.name,
-                RequestBody.create(MediaType.parse("application/octet-stream"), file)
+                RequestBody.create(fileMediaType, file)
             )
             .build()
 
@@ -52,7 +60,7 @@ class TelegramUploader(private val context: Context) {
 
         try {
             client.newCall(req).execute().use { resp ->
-                Log.d("TG-UPLOADER", "TG resp: ${resp.code()} - ${resp.message()}")
+                Log.d("TG-UPLOADER", "TG resp: ${resp.code} - ${resp.message}")
             }
         } catch (e: Exception) {
             e.printStackTrace()
