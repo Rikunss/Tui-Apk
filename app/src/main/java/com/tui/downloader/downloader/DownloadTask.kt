@@ -11,7 +11,7 @@ import java.util.UUID
  */
 class DownloadTask(
     val url: String,
-    private val destDir: String,
+    val destDir: String,              // ← FIX: public, bukan private
     private val callback: () -> Unit
 ) {
     val id: String = UUID.randomUUID().toString()
