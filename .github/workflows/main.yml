@@ -5,6 +5,9 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
+permissions:
+  contents: write   # ⬅ wajib biar bisa bikin release
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -31,10 +34,6 @@ jobs:
         name: TuiDownloader-Release
         path: app/build/outputs/apk/release/*.apk
 
-    # ===========================
-    #   AUTO CREATE RELEASE
-    # ===========================
-
     - name: Get Current Date
       id: date
       run: echo "date=$(date +'%Y%m%d-%H%M%S')" >> $GITHUB_OUTPUT
@@ -45,8 +44,8 @@ jobs:
         tag_name: v${{ steps.date.outputs.date }}
         name: "TuiDownloader Release ${{ steps.date.outputs.date }}"
         body: |
-          Automated Release Build
-          Timestamp: ${{ steps.date.outputs.date }}
+          Auto Release Build
+          Generated at: ${{ steps.date.outputs.date }}
         files: app/build/outputs/apk/release/*.apk
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
