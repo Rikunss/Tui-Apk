@@ -2,22 +2,24 @@ package com.tui.downloader
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.tui.downloader.databinding.ActivitySettingsBinding
+import androidx.preference.PreferenceFragmentCompat
+import com.tui.downloader.R
 
 class SettingsActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivitySettingsBinding
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_settings)
 
-        binding = ActivitySettingsBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
-        // Load preference fragment
         supportFragmentManager
             .beginTransaction()
-            .replace(binding.settingsContainer.id, SettingsFragment())
+            .replace(R.id.settings_container, SettingsFragment())
             .commit()
+    }
+}
+
+class SettingsFragment : PreferenceFragmentCompat() {
+    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+        setPreferencesFromResource(R.xml.settings_prefs, rootKey)
     }
 }
