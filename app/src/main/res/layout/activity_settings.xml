@@ -37,11 +37,21 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
+    <!-- Tombol pilih folder -->
     <Button
         android:id="@+id/btnPickFolder"
         android:text="Set Download Folder"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"/>
+
+    <!-- 🔥 Status akses folder -->
+    <TextView
+        android:id="@+id/txtFolderStatus"
+        android:text="❌ Belum diberi akses"
+        android:textSize="14sp"
+        android:layout_marginTop="8dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 
 </LinearLayout>
