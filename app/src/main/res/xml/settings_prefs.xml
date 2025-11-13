@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <EditTextPreference
+        android:key="bot_token"
+        android:title="Bot Token"
+        android:useSimpleSummaryProvider="true"
+        android:dialogTitle="Masukkan bot token Telegram"/>
+
+    <EditTextPreference
+        android:key="chat_id"
+        android:title="Chat ID"
+        android:useSimpleSummaryProvider="true"
+        android:dialogTitle="Masukkan chat id Telegram"/>
+
+</PreferenceScreen>
