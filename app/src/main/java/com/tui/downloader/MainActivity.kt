@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.provider.Settings
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -25,45 +26,40 @@ class MainActivity : AppCompatActivity() {
     private val scope = MainScope()
     private val repo by lazy { DownloadRepository.getInstance(applicationContext) }
 
-    // PERMISSION HANDLER (Android 10–13+)
+    // Permission launcher
     private val requestPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
             if (!granted) {
-                Toast.makeText(
-                    this,
-                    "Storage permission needed",
-                    Toast.LENGTH_SHORT
-                ).show()
+                Toast.makeText(this, "Storage permission needed", Toast.LENGTH_SHORT).show()
             }
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Inflate layout
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        supportActionBar?.hide() // UI Figma tidak pakai ActionBar
+        supportActionBar?.hide()
 
         checkStoragePermission()
         setupRecycler()
         setupButtons()
 
-        // Observe list update
         repo.onChange = {
-            scope.launch { binding.recycler.adapter?.notifyDataSetChanged() }
+            scope.launch {
+                binding.recycler.adapter?.notifyDataSetChanged()
+            }
         }
     }
 
-    // ===============================
-    //       STORAGE PERMISSION
-    // ===============================
-
+    // ============================================================
+    // STORAGE PERMISSION HANDLER
+    // ============================================================
     private fun checkStoragePermission() {
         when {
             Build.VERSION.SDK_INT >= 33 -> {
-                val perm = Manifest.permission.READ_MEDIA_AUDIO
+                val perm = Manifest.permission.READ_MEDIA_IMAGES
                 if (ContextCompat.checkSelfPermission(this, perm)
                     != PackageManager.PERMISSION_GRANTED
                 ) {
@@ -92,22 +88,20 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // ===============================
-    //       RECYCLER VIEW
-    // ===============================
-
+    // ============================================================
+    // RECYCLER
+    // ============================================================
     private fun setupRecycler() {
         binding.recycler.layoutManager = LinearLayoutManager(this)
         binding.recycler.adapter = DownloadListAdapter(repo)
     }
 
-    // ===============================
-    //       BUTTON HANDLER
-    // ===============================
-
+    // ============================================================
+    // BUTTON HANDLER
+    // ============================================================
     private fun setupButtons() {
 
-        // Tombol "+" → Add Download
+        // ADD DOWNLOAD
         binding.btnAdd.setOnClickListener {
             val url = binding.inputUrl.text.toString().trim()
 
@@ -116,22 +110,24 @@ class MainActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
+            // Default folder
             val downloadPath = "/storage/emulated/0/Download/Tui Downloader/"
             val folder = File(downloadPath)
-
             if (!folder.exists()) folder.mkdirs()
 
             try {
                 repo.createDownload(url, downloadPath)
                 binding.recycler.adapter?.notifyDataSetChanged()
+
                 startService(Intent(this, DownloadManagerService::class.java))
+
                 Toast.makeText(this, "Download started", Toast.LENGTH_SHORT).show()
             } catch (e: Exception) {
                 Toast.makeText(this, "Error adding download", Toast.LENGTH_SHORT).show()
             }
         }
 
-        // Tombol "Menu" → buka Settings Activity
+        // SETTINGS PAGE
         binding.btnMenu.setOnClickListener {
             startActivity(Intent(this, SettingsActivity::class.java))
         }
