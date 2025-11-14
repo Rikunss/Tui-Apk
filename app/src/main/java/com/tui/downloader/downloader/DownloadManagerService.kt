@@ -6,15 +6,12 @@ import android.app.NotificationManager
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import kotlinx.coroutines.*
 
-/**
- * Foreground service yang menjalankan queue download.
- * Service ini tetap hidup selama ada task yang berjalan.
- */
 class DownloadManagerService : Service() {
 
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
@@ -33,8 +30,8 @@ class DownloadManagerService : Service() {
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onDestroy() {
-        super.onDestroy()
         scope.cancel()
+        super.onDestroy()
     }
 
     private fun startQueueWorker() {
@@ -43,8 +40,10 @@ class DownloadManagerService : Service() {
                 val task = repo.getNextPending() ?: break
                 try {
                     task.start()
-                } catch (_: CancellationException) {}
-                catch (e: Exception) { e.printStackTrace() }
+                } catch (_: CancellationException) {
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
             }
             stopSelf()
         }
@@ -54,19 +53,33 @@ class DownloadManagerService : Service() {
         val channelId = "tui_downloader_channel"
         val name = "Tui Downloader Service"
 
+        // Create notification channel for Android O+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val chan = NotificationChannel(channelId, name, NotificationManager.IMPORTANCE_LOW)
+            val channel = NotificationChannel(
+                channelId,
+                name,
+                NotificationManager.IMPORTANCE_LOW
+            )
             val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            manager.createNotificationChannel(chan)
+            manager.createNotificationChannel(channel)
         }
 
         val notif: Notification = NotificationCompat.Builder(this, channelId)
             .setContentTitle("Tui Downloader")
-            .setContentText("Downloading...")
+            .setContentText("Downloading…")
             .setSmallIcon(android.R.drawable.stat_sys_download)
             .setOngoing(true)
             .build()
 
-        startForeground(1, notif)
+        // Android 14+ requires specifying FGS type
+        if (Build.VERSION.SDK_INT >= 34) {
+            startForeground(
+                1,
+                notif,
+                ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
+            )
+        } else {
+            startForeground(1, notif)
+        }
     }
 }
