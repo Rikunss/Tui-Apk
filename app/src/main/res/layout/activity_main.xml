@@ -11,7 +11,7 @@
         android:text="Tui Downloader 1.0"
         android:textSize="22sp"
         android:textStyle="bold"
-        android:fontFamily="@font/inter_bold"
+        android:fontFamily="@font/myfont"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 
