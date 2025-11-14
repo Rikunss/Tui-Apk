@@ -4,6 +4,8 @@ import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -21,54 +23,22 @@ class MainActivity : AppCompatActivity() {
     private val scope = MainScope()
     private val repo by lazy { DownloadRepository.getInstance(applicationContext) }
 
-    private val requestPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { granted ->
-        if (!granted) {
-            Toast.makeText(this, "Storage permission needed", Toast.LENGTH_SHORT).show()
+    private val requestPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+            if (!granted) {
+                Toast.makeText(this, "Storage permission needed", Toast.LENGTH_SHORT).show()
+            }
         }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Init layout
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
-        // ActionBar title
-        supportActionBar?.title = "Tui Downloader"
-    }
-
-    // 🔥 Penting: fungsi ini HARUS di luar onCreate
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.main_menu, menu)
-        return true
-    }
-
-    // 🔥 Penting: ini juga harus di luar onCreate
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.action_settings -> {
-                startActivity(Intent(this, SettingsActivity::class.java))
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
-        }
-    }
-}
-
-        // Load saved dark mode
-        val prefs = getSharedPreferences("settings", MODE_PRIVATE)
-        val savedMode = prefs.getInt(
-            "dark_mode",
-            androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO
-        )
-        androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode(savedMode)
-
         // Inflate layout
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        // Set ActionBar title
+        supportActionBar?.title = "Tui Downloader"
 
         checkStoragePermission()
         setupRecycler()
@@ -80,6 +50,29 @@ class MainActivity : AppCompatActivity() {
             scope.launch { binding.recycler.adapter?.notifyDataSetChanged() }
         }
     }
+
+    // ===============================
+    //       ACTIONBAR MENU
+    // ===============================
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.main_menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_settings -> {
+                startActivity(Intent(this, SettingsActivity::class.java))
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    // ===============================
+    //       OTHER FUNCTIONS
+    // ===============================
 
     private fun setupDarkModeToggle() {
         binding.btnDarkMode.setOnClickListener {
@@ -120,10 +113,6 @@ class MainActivity : AppCompatActivity() {
 
                 startService(Intent(this, DownloadManagerService::class.java))
             }
-        }
-
-        binding.btnSettings.setOnClickListener {
-            startActivity(Intent(this, SettingsActivity::class.java))
         }
     }
 }
