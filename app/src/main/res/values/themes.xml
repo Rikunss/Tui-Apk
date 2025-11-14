@@ -17,6 +17,10 @@
         <item name="colorOnPrimary">@color/md_theme_light_onPrimary</item>
         <item name="colorPrimaryContainer">@color/md_theme_light_primaryContainer</item>
         <item name="colorOnPrimaryContainer">@color/md_theme_light_onPrimaryContainer</item>
+    <style name="AppFont">
+        <item name="android:fontFamily">@font/myfont_family</item>
+        <item name="fontFamily">@font/myfont_family</item>
+
     </style>
 
 </resources>
