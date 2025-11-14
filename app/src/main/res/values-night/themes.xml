@@ -3,11 +3,23 @@
 
     <!-- Material 3 Dark Theme -->
     <style name="Theme.TuiDownloader" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="android:fontFamily">@font/myfont_family</item>
+        <item name="fontFamily">@font/myfont_family</item>
+
+        <!-- Untuk Material 3 -->
+        <item name="textAppearanceHeadlineLarge">@style/AppFont</item>
+        <item name="textAppearanceBodyLarge">@style/AppFont</item>
+        <item name="textAppearanceBodyMedium">@style/AppFont</item>
+        <item name="textAppearanceBodySmall">@style/AppFont</item>
+
         <!-- Customize dark colors if needed -->
         <item name="colorPrimary">@color/md_theme_dark_primary</item>
         <item name="colorOnPrimary">@color/md_theme_dark_onPrimary</item>
         <item name="colorPrimaryContainer">@color/md_theme_dark_primaryContainer</item>
         <item name="colorOnPrimaryContainer">@color/md_theme_dark_onPrimaryContainer</item>
+    <style name="AppFont">
+        <item name="android:fontFamily">@font/myfont_family</item>
+        <item name="fontFamily">@font/myfont_family</item>
     </style>
 
 </resources>
