@@ -6,7 +6,6 @@ import android.app.NotificationManager
 import android.app.Service
 import android.content.Context
 import android.content.Intent
-import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
@@ -53,7 +52,6 @@ class DownloadManagerService : Service() {
         val channelId = "tui_downloader_channel"
         val name = "Tui Downloader Service"
 
-        // Create notification channel for Android O+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 channelId,
@@ -71,15 +69,7 @@ class DownloadManagerService : Service() {
             .setOngoing(true)
             .build()
 
-        // Android 14+ requires specifying FGS type
-        if (Build.VERSION.SDK_INT >= 34) {
-            startForeground(
-                1,
-                notif,
-                ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
-            )
-        } else {
-            startForeground(1, notif)
-        }
+        // FIX — Jangan pakai Foreground Service type (DATA_SYNC bikin error)
+        startForeground(1, notif)
     }
 }
