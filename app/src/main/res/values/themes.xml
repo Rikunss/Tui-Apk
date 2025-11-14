@@ -3,6 +3,15 @@
 
     <!-- Material 3 Light Theme -->
     <style name="Theme.TuiDownloader" parent="Theme.Material3.Light.NoActionBar">
+        <item name="android:fontFamily">@font/myfont_family</item>
+        <item name="fontFamily">@font/myfont_family</item>
+
+        <!-- Untuk Material 3 -->
+        <item name="textAppearanceHeadlineLarge">@style/AppFont</item>
+        <item name="textAppearanceBodyLarge">@style/AppFont</item>
+        <item name="textAppearanceBodyMedium">@style/AppFont</item>
+        <item name="textAppearanceBodySmall">@style/AppFont</item>
+
         <!-- Customize your light theme colors here if needed -->
         <item name="colorPrimary">@color/md_theme_light_primary</item>
         <item name="colorOnPrimary">@color/md_theme_light_onPrimary</item>
