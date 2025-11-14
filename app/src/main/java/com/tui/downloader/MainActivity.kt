@@ -16,6 +16,7 @@ import com.tui.downloader.downloader.DownloadManagerService
 import com.tui.downloader.downloader.DownloadRepository
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
+import java.io.File
 
 class MainActivity : AppCompatActivity() {
 
@@ -33,11 +34,9 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Inflate layout
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Set ActionBar title
         supportActionBar?.title = "Tui Downloader"
 
         checkStoragePermission()
@@ -45,14 +44,14 @@ class MainActivity : AppCompatActivity() {
         setupButtons()
         setupDarkModeToggle()
 
-        // Observe download changes
+        // Observe changes
         repo.onChange = {
             scope.launch { binding.recycler.adapter?.notifyDataSetChanged() }
         }
     }
 
     // ===============================
-    //       ACTIONBAR MENU
+    // ACTIONBAR
     // ===============================
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -71,7 +70,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     // ===============================
-    //       OTHER FUNCTIONS
+    // OTHER FUNCTIONS
     // ===============================
 
     private fun setupDarkModeToggle() {
@@ -80,11 +79,10 @@ class MainActivity : AppCompatActivity() {
             val current = androidx.appcompat.app.AppCompatDelegate.getDefaultNightMode()
 
             val newMode =
-                if (current == androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES) {
+                if (current == androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES)
                     androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO
-                } else {
+                else
                     androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES
-                }
 
             androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode(newMode)
             prefs.edit().putInt("dark_mode", newMode).apply()
@@ -92,8 +90,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun checkStoragePermission() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-            != PackageManager.PERMISSION_GRANTED
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            ) != PackageManager.PERMISSION_GRANTED
         ) {
             requestPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
         }
@@ -104,15 +104,31 @@ class MainActivity : AppCompatActivity() {
         binding.recycler.adapter = DownloadListAdapter(repo)
     }
 
+    // ===============================
+    // BUTTON ADD DOWNLOAD
+    // ===============================
+
     private fun setupButtons() {
         binding.btnAdd.setOnClickListener {
-            val url = binding.inputUrl.text.toString().trim()
-            if (url.isNotEmpty()) {
-                repo.createDownload(url, filesDir.absolutePath)
-                binding.recycler.adapter?.notifyDataSetChanged()
 
-                startService(Intent(this, DownloadManagerService::class.java))
-            }
+            val url = binding.inputUrl.text.toString().trim()
+            if (url.isEmpty()) return@setOnClickListener
+
+            // Path download public
+            val downloadPath = "/storage/emulated/0/Download/Tui Downloader/"
+
+            val folder = File(downloadPath)
+            if (!folder.exists()) folder.mkdirs()
+
+            repo.createDownload(url, downloadPath)
+
+            binding.recycler.adapter?.notifyDataSetChanged()
+
+            startService(Intent(this, DownloadManagerService::class.java))
+        }
+
+        binding.btnSettings.setOnClickListener {
+            startActivity(Intent(this, SettingsActivity::class.java))
         }
     }
 }
