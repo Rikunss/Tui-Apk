@@ -49,27 +49,26 @@ class DownloadManagerService : Service() {
     }
 
     private fun startForegroundServiceNotification() {
-        val channelId = "tui_downloader_channel"
-        val name = "Tui Downloader Service"
+    val channelId = "tui_downloader_channel"
+    val name = "Tui Downloader Service"
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                channelId,
-                name,
-                NotificationManager.IMPORTANCE_LOW
-            )
-            val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            manager.createNotificationChannel(channel)
-        }
-
-        val notif: Notification = NotificationCompat.Builder(this, channelId)
-            .setContentTitle("Tui Downloader")
-            .setContentText("Downloading…")
-            .setSmallIcon(android.R.drawable.stat_sys_download)
-            .setOngoing(true)
-            .build()
-
-        // FIX — Jangan pakai Foreground Service type (DATA_SYNC bikin error)
-        startForeground(1, notif)
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        val channel = NotificationChannel(
+            channelId,
+            name,
+            NotificationManager.IMPORTANCE_LOW
+        )
+        val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        manager.createNotificationChannel(channel)
     }
-}
+
+    val notif = NotificationCompat.Builder(this, channelId)
+        .setContentTitle("Tui Downloader")
+        .setContentText("Downloading…")
+        .setSmallIcon(android.R.drawable.stat_sys_download)
+        .setOngoing(true)
+        .build()
+
+    // Tidak pakai TYPE apapun, aman di Android 14+
+    startForeground(1, notif)
+    }
