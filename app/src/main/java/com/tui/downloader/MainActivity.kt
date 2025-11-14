@@ -31,22 +31,32 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-    menuInflater.inflate(R.menu.main_menu, menu)
-    return true
+
+        // Init layout
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        // ActionBar title
+        supportActionBar?.title = "Tui Downloader"
     }
-    
+
+    // 🔥 Penting: fungsi ini HARUS di luar onCreate
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.main_menu, menu)
+        return true
+    }
+
+    // 🔥 Penting: ini juga harus di luar onCreate
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-    return when (item.itemId) {
-        R.id.action_settings -> {
-            startActivity(Intent(this, SettingsActivity::class.java))
-            true
+        return when (item.itemId) {
+            R.id.action_settings -> {
+                startActivity(Intent(this, SettingsActivity::class.java))
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
         }
-        else -> super.onOptionsItemSelected(item)
     }
 }
-
 
         // Load saved dark mode
         val prefs = getSharedPreferences("settings", MODE_PRIVATE)
