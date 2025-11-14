@@ -19,7 +19,7 @@
             android:text="Nama File.zip"
             android:textSize="16sp"
             android:textStyle="bold"
-            android:fontFamily="@font/inter_medium"/>
+            android:fontFamily="@font/myfont"/>
 
         <ProgressBar
             android:id="@+id/progressBar"
