@@ -3,9 +3,10 @@ package com.tui.downloader
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
+import android.provider.Settings
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -24,80 +25,76 @@ class MainActivity : AppCompatActivity() {
     private val scope = MainScope()
     private val repo by lazy { DownloadRepository.getInstance(applicationContext) }
 
+    // PERMISSION HANDLER (Android 10–13+)
     private val requestPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
             if (!granted) {
-                Toast.makeText(this, "Storage permission needed", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    this,
+                    "Storage permission needed",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // Inflate layout
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        supportActionBar?.title = "Tui Downloader"
+        supportActionBar?.hide() // UI Figma tidak pakai ActionBar
 
         checkStoragePermission()
         setupRecycler()
         setupButtons()
-        setupDarkModeToggle()
 
-        // Observe changes
+        // Observe list update
         repo.onChange = {
             scope.launch { binding.recycler.adapter?.notifyDataSetChanged() }
         }
     }
 
     // ===============================
-    // ACTIONBAR
+    //       STORAGE PERMISSION
     // ===============================
-
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.main_menu, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.action_settings -> {
-                startActivity(Intent(this, SettingsActivity::class.java))
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
-        }
-    }
-
-    // ===============================
-    // OTHER FUNCTIONS
-    // ===============================
-
-    private fun setupDarkModeToggle() {
-        binding.btnDarkMode.setOnClickListener {
-            val prefs = getSharedPreferences("settings", MODE_PRIVATE)
-            val current = androidx.appcompat.app.AppCompatDelegate.getDefaultNightMode()
-
-            val newMode =
-                if (current == androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES)
-                    androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO
-                else
-                    androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES
-
-            androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode(newMode)
-            prefs.edit().putInt("dark_mode", newMode).apply()
-        }
-    }
 
     private fun checkStoragePermission() {
-        if (ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            requestPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        when {
+            Build.VERSION.SDK_INT >= 33 -> {
+                val perm = Manifest.permission.READ_MEDIA_AUDIO
+                if (ContextCompat.checkSelfPermission(this, perm)
+                    != PackageManager.PERMISSION_GRANTED
+                ) {
+                    requestPermissionLauncher.launch(perm)
+                }
+            }
+
+            Build.VERSION.SDK_INT >= 30 -> {
+                if (!Environment.isExternalStorageManager()) {
+                    val intent = Intent(
+                        Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION,
+                        Uri.parse("package:$packageName")
+                    )
+                    startActivity(intent)
+                }
+            }
+
+            else -> {
+                val perm = Manifest.permission.WRITE_EXTERNAL_STORAGE
+                if (ContextCompat.checkSelfPermission(this, perm)
+                    != PackageManager.PERMISSION_GRANTED
+                ) {
+                    requestPermissionLauncher.launch(perm)
+                }
+            }
         }
     }
+
+    // ===============================
+    //       RECYCLER VIEW
+    // ===============================
 
     private fun setupRecycler() {
         binding.recycler.layoutManager = LinearLayoutManager(this)
@@ -105,29 +102,37 @@ class MainActivity : AppCompatActivity() {
     }
 
     // ===============================
-    // BUTTON ADD DOWNLOAD
+    //       BUTTON HANDLER
     // ===============================
 
     private fun setupButtons() {
+
+        // Tombol "+" → Add Download
         binding.btnAdd.setOnClickListener {
-
             val url = binding.inputUrl.text.toString().trim()
-            if (url.isEmpty()) return@setOnClickListener
 
-            // Path download public
+            if (url.isEmpty()) {
+                Toast.makeText(this, "URL kosong!", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
             val downloadPath = "/storage/emulated/0/Download/Tui Downloader/"
-
             val folder = File(downloadPath)
+
             if (!folder.exists()) folder.mkdirs()
 
-            repo.createDownload(url, downloadPath)
-
-            binding.recycler.adapter?.notifyDataSetChanged()
-
-            startService(Intent(this, DownloadManagerService::class.java))
+            try {
+                repo.createDownload(url, downloadPath)
+                binding.recycler.adapter?.notifyDataSetChanged()
+                startService(Intent(this, DownloadManagerService::class.java))
+                Toast.makeText(this, "Download started", Toast.LENGTH_SHORT).show()
+            } catch (e: Exception) {
+                Toast.makeText(this, "Error adding download", Toast.LENGTH_SHORT).show()
+            }
         }
 
-        binding.btnSettings.setOnClickListener {
+        // Tombol "Menu" → buka Settings Activity
+        binding.btnMenu.setOnClickListener {
             startActivity(Intent(this, SettingsActivity::class.java))
         }
     }
